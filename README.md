@@ -12,6 +12,15 @@ Blog of Weijindan
 * screenshots: 皮肤风格
 * src: 源码文件目录
   * assets: 一些公共图片资源
+  * commons: 全局常亮
+  * components: 组件
+    * common: 公共组件
+    * page: 页面组件
+  * i18n: 国际化相关
+  * router: 路由
+  * main.js: 入口文件
+* static: 静态资源
+
 ## 执行脚本
 
 ``` bash
