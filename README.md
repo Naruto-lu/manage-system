@@ -11,7 +11,7 @@ Blog of Weijindan
 * config: 项目打包文件
 * screenshots: 皮肤风格
 * src: 源码文件目录
-
+    * assets: 一些公共图片资源
 ## 执行脚本
 
 ``` bash
