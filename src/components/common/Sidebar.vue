@@ -1,6 +1,6 @@
 <template>
     <div class="sidebar">
-        <el-menu :default-active="onRoutes" @select="handleselect" class="el-menu-vertical-demo" theme="dark" unique-opened router>
+        <el-menu :default-active="onRoutes" @select="handleselect" class="el-menu-vertical-demo" unique-opened router>
             <template v-for="item in items">
                 <template v-if="item.subs">
                     <el-submenu :index="item.index">
@@ -33,6 +33,11 @@
                         icon: 'el-icon-edit',
                         index: 'blogmanage',
                         title: '博文管理'
+                    },
+                    {
+                        icon: 'el-icon-picture',
+                        index: 'photomanage',
+                        title: '照片管理'
                     },
                     {
                         icon: 'el-icon-menu',
@@ -100,14 +105,17 @@
 
 <style scoped>
     .sidebar{
-        /*border: 2px solid red;*/
+        /* border: 2px solid red; */
         display: block;
         position: absolute;
         width: 200px;
         left: 0;
         top: 60px;
         bottom:0;
-        background: #2E363F;
+        background-color: #96a3b1;
+    }
+    .el-menu--dark{
+        background-color: #eef6f6;
     }
     .sidebar > ul {
         height:100%;

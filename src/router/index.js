@@ -23,6 +23,10 @@ export default new Router({
                     component: resolve => require(['../components/page/blog/index.vue'], resolve)
                 },
                 {
+                    path: '/photomanage',
+                    component: resolve => require(['../components/page/photo/index.vue'], resolve)
+                },
+                {
                     path: '/basetable',
                     component: resolve => require(['../components/page/BaseTable.vue'], resolve)
                 },
