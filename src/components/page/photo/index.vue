@@ -2,7 +2,7 @@
   <div class="photo">
     <div class="blogmanage-crumbs">
       <el-breadcrumb separator="/">
-        <el-breadcrumb-item><i class="el-icon-edit"></i> 照片管理</el-breadcrumb-item>
+        <el-breadcrumb-item><i class="el-icon-picture"></i> 照片管理</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <el-upload

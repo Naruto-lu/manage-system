@@ -23,8 +23,20 @@ export default new Router({
                     component: resolve => require(['../components/page/blog/index.vue'], resolve)
                 },
                 {
+                    path: '/comment',
+                    component: resolve => require(['../components/page/comment/index.vue'], resolve)
+                },
+                {
                     path: '/photomanage',
                     component: resolve => require(['../components/page/photo/index.vue'], resolve)
+                },
+                {
+                    path: '/photoreduce',
+                    component: resolve => require(['../components/page/photo/reduce.vue'], resolve)
+                },
+                {
+                    path: '/user',
+                    component: resolve => require(['../components/page/user/index.vue'], resolve)
                 },
                 {
                     path: '/basetable',

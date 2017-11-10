@@ -35,9 +35,24 @@
                         title: '博文管理'
                     },
                     {
+                        icon: 'el-icon-star-on',
+                        index: 'comment',
+                        title: '评论管理'
+                    },
+                    {
                         icon: 'el-icon-picture',
                         index: 'photomanage',
                         title: '照片管理'
+                    },
+                    {
+                        icon: 'el-icon-delete',
+                        index: 'photoreduce',
+                        title: '照片回收站'
+                    },
+                    {
+                        icon: 'el-icon-setting',
+                        index: 'user',
+                        title: '用户管理'
                     },
                     {
                         icon: 'el-icon-menu',
