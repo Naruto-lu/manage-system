@@ -11,7 +11,7 @@
         <el-input v-model="form.name"></el-input>
       </el-form-item>
       <el-form-item label="文章简介" label-width="70px">
-        <el-input type="textarea" placeholder="请输入内容" rows="5" v-model="form.textarea"></el-input>
+        <el-input type="textarea" placeholder="请输入内容" v-model="form.textarea"></el-input>
       </el-form-item>
       <el-form-item label="文章分类">
         <el-select v-model="form.value" placeholder="请选择">
@@ -24,7 +24,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="文章内容" label-width="70px">
-        <el-input type="textarea" placeholder="请输入内容" rows="5" v-model="form.textarea"></el-input>
+        <el-input type="textarea" placeholder="请输入内容" v-model="form.textarea"></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">

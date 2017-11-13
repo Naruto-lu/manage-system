@@ -38,6 +38,10 @@ module.exports = {
             '/ms':{
                 target: 'https://www.easy-mock.com/mock/592501a391470c0ac1fab128',
                 changeOrigin: true
+            },
+            '/blogmanage/getList':{
+                target: 'http://rapapi.org/mockjsdata/28929',
+                changeOrigin: true
             }
         },
         // CSS Sourcemaps off by default because relative paths are "buggy"

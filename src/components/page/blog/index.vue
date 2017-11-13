@@ -6,7 +6,7 @@
       </el-breadcrumb>
     </div>
     <div class="blogmanage-table">
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
+      <el-form :inline="true" label-width="69px" :model="formInline" class="demo-form-inline">
         <el-form-item label="时间选择">
           <el-date-picker
             v-model="formInline.date"
@@ -30,12 +30,22 @@
         <el-form-item label="简介">
           <el-input v-model="formInline.user" placeholder="请输入内容"></el-input>
         </el-form-item>
+        <el-form-item label="分类">
+          <el-select v-model="value" clearable placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <div class="operation-btns">
         <el-button class="operation-btns_right" type="primary" @click="onSubmit">
           <i class="el-icon-search"></i>
         </el-button>
-        <el-button type="primary" @click="onSubmit">批量删除</el-button>
+        <el-button type="primary" @click="delAll">批量删除</el-button>
         <el-button type="primary" @click="addBlog">新增博文</el-button>
       </div>
       <el-table
@@ -45,12 +55,11 @@
         tooltip-effect="dark"
         style="width: 100%"
         @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column label="日期" width="120">
-          <template scope="scope">{{ scope.row.date }}</template>
-        </el-table-column>
-        <el-table-column prop="name" label="文章标题" width="120"></el-table-column>
-        <el-table-column prop="address" label="文章简介" show-overflow-tooltip></el-table-column>
+        <el-table-column type="selection" width="50"></el-table-column>
+        <el-table-column prop="name" label="文章标题"></el-table-column>
+        <el-table-column prop="category" label="文章分类"></el-table-column>
+        <el-table-column prop="description" label="文章简介" show-overflow-tooltip></el-table-column>
+        <el-table-column label="日期" prop="date"></el-table-column>
         <el-table-column label="操作" width="200" fixed="right">
           <template scope="scope">
             <el-button type="text" size="small">
@@ -72,9 +81,9 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :page-sizes="[10, 20, 50]"
-        :page-size="10"
+        :page-size="pgsize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="35">
+        :total="total">
       </el-pagination>
     </div>
     <!-- 添加博文 -->
@@ -87,25 +96,24 @@
   export default {
     data() {
       return {
-        tableData: [{
-          date: '2016-05-03',
-          name: '随记1',
-          address: '某年某月某日'
-        }, {
-          date: '2016-05-02',
-          name: '随记2',
-          address: '从前有座山，山里有座庙'
-        }, {
-          date: '2016-05-04',
-          name: '随记3',
-          address: '像我这种庸俗的人，从不喜欢装深沉'
-        }],
+        tableData: [],
         formInline: {
           user: '',
           region: '',
           date: '',
           state1: ''
         },
+        options: [{
+          value: '选项1',
+          label: '日记'
+        }, {
+          value: '选项2',
+          label: '游玩'
+        }, {
+          value: '选项3',
+          label: '心情'
+        }],
+        value: '',
         pickerOptions2: {
           shortcuts: [{
             text: '最近一周',
@@ -133,15 +141,23 @@
             }
           }]
         },
-        dialogVisible: false
+        pgsize: 10, // 每页显示的条数
+        total: 0, // 总条目数
+        dialogVisible: false,
+        ids: [] // 博文id
       }
     },
     components: {
       AddBlog
     },
     methods: {
-      handleSelectionChange(val) {
-        this.multipleSelection = val
+      handleSelectionChange(val) { // 获取选中的博文id
+        let array = []
+        val.map(item => {
+          array.push(item.id)
+        })
+        this.ids = array
+        console.log('ids', this.ids)
       },
       handleSizeChange(val) {
         console.log(`每页 ${val} 条`)
@@ -151,6 +167,16 @@
       },
       onSubmit() {
         console.log('submit!')
+      },
+      delAll() { // 批量删除
+        if(this.ids.length === 0) {
+          this.$message({
+            message: '请选择要删除的博文！',
+            type: 'warning'
+          })
+        } else {
+          this.$message('请发送相应ajax请求！')
+        }
       },
       addBlog() {
         this.dialogVisible = true
@@ -185,6 +211,12 @@
     },
     mounted() {
       this.restaurants = this.loadAll()
+      this.$ajax.get('/blogmanage/getList').then(res => {
+        this.tableData = res.data.data.data
+        this.total = res.data.data.total
+      }).catch(err => {
+        console.log(err)
+      })
     }
   }
 </script>
