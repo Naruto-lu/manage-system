@@ -1,5 +1,6 @@
 <template>
-  <el-dialog
+  <div>
+    <el-dialog
     title="新增博文"
     :visible.sync="dialogVisible"
     width="100%"
@@ -14,7 +15,7 @@
         <el-input type="textarea" :rows="rows" placeholder="请输入内容" v-model="ruleForm.description"></el-input>
       </el-form-item>
       <el-form-item label="文章分类" prop="category">
-        <el-select v-model="ruleForm.category" placeholder="请选择">
+        <el-select v-model="ruleForm.category" clearable placeholder="请选择">
           <el-option
             v-for="item in options"
             :key="item.value"
@@ -24,22 +25,27 @@
         </el-select>
       </el-form-item>
       <el-form-item label="文章内容">
-        <el-button type="primary" size="small">编辑文章内容</el-button>
+        <el-button type="primary" size="small" @click="editDialog">编辑文章内容</el-button>
+        <el-button v-if="state" round type="primary" size="mini" icon="check"></el-button>
       </el-form-item>
     </el-form>
-    <div slot="footer">
-      <el-button type="primary" @click="saveBlog">{{$t('button.save')}}</el-button>
-      <el-button @click="dialogVisible = false">{{$t('button.cancel')}}</el-button>
-    </div>
-  </el-dialog>
+      <div slot="footer">
+        <el-button type="primary" @click="saveBlog">{{$t('button.save')}}</el-button>
+        <el-button @click="dialogVisible = false">{{$t('button.cancel')}}</el-button>
+      </div>
+    </el-dialog>
+    <vue-editor :display="showDialog" @state="stateChange" @close="closeList"></vue-editor>
+  </div>
 </template>
 
 <script>
+  import VueEditor from './VueEditor.vue'
   export default {
     props: ['display'],
     data() {
       return {
         rows: 5,
+        showDialog: false,
         dialogVisible: false,
         ruleForm: {
           name: '',
@@ -67,8 +73,12 @@
             value: '选项3',
             label: '心情'
           }
-        ]
+        ],
+        state: false
       }
+    },
+    components: {
+      VueEditor
     },
     watch: {
       display(v) {
@@ -79,9 +89,18 @@
       this.refreshDialog = false
     },
     methods: {
+      closeList() {
+        this.showDialog = false
+      },
       closeDialog() {
         this.$emit('close', this.refreshDialog)
         this.refreshDialog = false
+      },
+      editDialog() {
+        this.showDialog = true
+      },
+      stateChange(v) {
+        this.state = v ? true : false 
       },
       saveBlog() {
         this.$refs.ruleForm.validate(valid => {
@@ -101,8 +120,7 @@
           } else {
             this.$message.error('请把必填项补充完整！')
           }
-        })
-        
+        }) 
       }
     }
   }
