@@ -39,7 +39,7 @@ module.exports = {
                 target: 'https://www.easy-mock.com/mock/592501a391470c0ac1fab128',
                 changeOrigin: true
             },
-            '/blogmanage/getList':{
+            '/blogoperation':{
                 target: 'http://rapapi.org/mockjsdata/28929',
                 changeOrigin: true
             }

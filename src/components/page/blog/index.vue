@@ -87,7 +87,7 @@
       </el-pagination>
     </div>
     <!-- 添加博文 -->
-    <add-blog :display="dialogVisible" @close="dialogVisible = false"></add-blog>
+    <add-blog :display="dialogVisible" @close="close"></add-blog>
   </div>
 </template>
 
@@ -168,6 +168,14 @@
       onSubmit() {
         console.log('submit!')
       },
+      close(r) {
+        console.log(r)
+        if (r) {
+          this.getData()
+        }
+        this.dialogVisible = false // 重新置为false，否则不会再次弹出
+        console.log('hhhh')
+      },
       delAll() { // 批量删除
         if(this.ids.length === 0) {
           this.$message({
@@ -207,16 +215,19 @@
       },
       handleSelect(item) {
         console.log(item)
+      },
+      getData() {
+        this.$ajax.get('/blogoperation/getList').then(res => {
+          this.tableData = res.data.data.data
+          this.total = res.data.data.total
+        }).catch(err => {
+          console.log(err)
+        })
       }
     },
     mounted() {
       this.restaurants = this.loadAll()
-      this.$ajax.get('/blogmanage/getList').then(res => {
-        this.tableData = res.data.data.data
-        this.total = res.data.data.total
-      }).catch(err => {
-        console.log(err)
-      })
+      this.getData()
     }
   }
 </script>
