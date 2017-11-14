@@ -6,46 +6,57 @@
       </el-breadcrumb>
     </div>
     <div class="blogmanage-table">
-      <el-form :inline="true" label-width="69px" :model="formInline" class="demo-form-inline">
-        <el-form-item label="时间选择">
-          <el-date-picker
-            v-model="formInline.date"
-            type="datetimerange"
-            placeholder="请选择时间段"
-            :picker-options="pickerOptions2"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="标题">
-          <el-autocomplete
-            class="inline-input"
-            v-model="formInline.state1"
-            :fetch-suggestions="querySearch"
-            placeholder="请输入内容"
-            @select="handleSelect"
-          ></el-autocomplete>
-        </el-form-item>
-        <el-form-item label="简介">
-          <el-input v-model="formInline.user" placeholder="请输入内容"></el-input>
-        </el-form-item>
-        <el-form-item label="分类">
-          <el-select v-model="value" clearable placeholder="请选择">
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
+      <el-form :inline="false" label-width="69px" :model="formInline">
+        <el-row>
+          <el-col :span="9">
+            <el-form-item label="时间选择">
+              <el-date-picker
+                v-model="formInline.allTime"
+                type="datetimerange"
+                placeholder="请选择时间段"
+                :picker-options="pickerOptions2"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="标题">
+              <el-autocomplete
+                class="inline-input"
+                v-model="formInline.title"
+                :fetch-suggestions="querySearch"
+                placeholder="请输入内容"
+                @select="handleSelect"
+              ></el-autocomplete>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="简介">
+              <el-input v-model="formInline.description" placeholder="请输入内容"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="分类">
+              <el-select v-model="category" clearable placeholder="请选择">
+                <el-option
+                  v-for="item in categoryList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div class="operation-btns">
-        <el-button class="operation-btns_right" type="primary" @click="onSubmit">
+        <el-button class="operation-btns_right" type="primary" @click="searchEvent">
           <i class="el-icon-search"></i>
         </el-button>
         <el-button type="primary" @click="delAll">批量删除</el-button>
+        <el-button type="primary" @click="categoryDetail">分类管理</el-button>
         <el-button type="primary" @click="addBlog">新增博文</el-button>
       </div>
       <el-table
@@ -56,7 +67,11 @@
         style="width: 100%"
         @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="50"></el-table-column>
-        <el-table-column prop="name" label="文章标题"></el-table-column>
+        <el-table-column label="文章标题">
+          <template scope="scope">
+            <el-button type="text" @click="detailEvent(scope.row.id)">{{scope.row.name}}</el-button>
+          </template>
+        </el-table-column>
         <el-table-column prop="category" label="文章分类"></el-table-column>
         <el-table-column prop="description" label="文章简介" show-overflow-tooltip></el-table-column>
         <el-table-column label="日期" prop="date"></el-table-column>
@@ -65,10 +80,10 @@
             <el-button type="text" size="small">
               <i class="el-icon-edit"></i> 编辑
             </el-button>
-            <el-button type="text" size="small">
+            <el-button type="text" size="small" @click="detailEvent(scope.row.id)">
               <i class="el-icon-view"></i> 详情
             </el-button>
-            <el-button type="text" size="small">
+            <el-button type="text" size="small" @click="delBlog(scope.row.id)">
               <font color="red"><i class="el-icon-delete"></i> 删除</font>
             </el-button>
           </template>
@@ -88,22 +103,28 @@
     </div>
     <!-- 添加博文 -->
     <add-blog :display="dialogVisible" @close="close"></add-blog>
+    <!-- 博文详情 -->
+    <detail-blog :display="showDetail" @close="closeEvent"></detail-blog>
+    <!-- 分类管理 -->
+    <category-manage :display="showCategory" @close="closeCategory"></category-manage>
   </div>
 </template>
 
 <script>
   import AddBlog from './addBlog.vue'
+  import DetailBlog from './detailBlog.vue'
+  import CategoryManage from './categoryManage.vue'
+  import Moment from 'moment'
   export default {
     data() {
       return {
-        tableData: [],
+        tableData: [], // 列表数据
         formInline: {
-          user: '',
-          region: '',
-          date: '',
-          state1: ''
+          description: '',
+          allTime: '',
+          title: ''
         },
-        options: [{
+        categoryList: [{
           value: '选项1',
           label: '日记'
         }, {
@@ -113,7 +134,7 @@
           value: '选项3',
           label: '心情'
         }],
-        value: '',
+        category: '',
         pickerOptions2: {
           shortcuts: [{
             text: '最近一周',
@@ -144,11 +165,16 @@
         pgsize: 10, // 每页显示的条数
         total: 0, // 总条目数
         dialogVisible: false,
-        ids: [] // 博文id
+        showDetail: false,
+        showCategory: false,
+        ids: [], // 博文id
+        TitleLists: [] // 标题下拉列表
       }
     },
     components: {
-      AddBlog
+      AddBlog,
+      DetailBlog,
+      CategoryManage
     },
     methods: {
       handleSelectionChange(val) { // 获取选中的博文id
@@ -165,8 +191,18 @@
       handleCurrentChange(val) {
         console.log(`当前页: ${val}`)
       },
-      onSubmit() {
-        console.log('submit!')
+      searchEvent() { // 搜索
+        const startTime = this.formInline.allTime[0] == null ? '' : Moment(this.formInline.allTime[0]).valueOf()
+        const endTime = this.formInline.allTime[1] == null ? '' : Moment(this.formInline.allTime[1]).valueOf()
+        const title = this.formInline.title ? this.formInline.title : ''
+        const description = this.formInline.description ? this.formInline.descriptio : ''
+        const category = this.category ? this.category : ''
+        let SEARCHURL = '/blogoperation/getList?startTime=' + startTime
+                        + '&endTime=' + endTime + '&title=' + title
+                        + '&description=' + description + '&category=' + category
+        this.$ajax.get(SEARCHURL).then(res => {
+          console.log(res)
+        })
       },
       close(r) {
         console.log(r)
@@ -175,6 +211,12 @@
         }
         this.dialogVisible = false // 重新置为false，否则不会再次弹出
         console.log('hhhh')
+      },
+      closeEvent() {
+        this.showDetail = false
+      },
+      closeCategory() {
+        this.showCategory = false
       },
       delAll() { // 批量删除
         if(this.ids.length === 0) {
@@ -186,12 +228,43 @@
           this.$message('请发送相应ajax请求！')
         }
       },
+      delBlog(id) { // 删除
+        console.log(id)
+        this.delConfirm('确定删除博文？', id)
+      },
+      delConfirm(message, id) { // 删除确认
+        this.$confirm(message)
+        .then(() => {
+          this.delEvent(id)
+        })
+      },
+      delEvent(id) { // 删除事件
+        if (id) {
+          let DELURL = '/blogoperation/delBlog?id=' + id
+          this.$ajax.get(DELURL).then(res => {
+            if (res.status) {
+              this.$message({message: '删除成功！', type: 'success'})
+            } else {
+              this.$message.error('删除失败！')
+            }
+          }).catch(err => {
+            console.log(err)
+          })
+        }
+      },
+      detailEvent(id) { // 详情
+        console.log(id)
+        this.showDetail = true
+      },
       addBlog() {
         this.dialogVisible = true
       },
+      categoryDetail() {
+        this.showCategory = true
+      },
       querySearch(queryString, cb) {
-        var restaurants = this.restaurants
-        var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants
+        var TitleLists = this.TitleLists
+        var results = queryString ? TitleLists.filter(this.createFilter(queryString)) : TitleLists
         // 调用 callback 返回建议列表的数据
         cb(results)
       },
@@ -200,18 +273,12 @@
           return (restaurant.value.indexOf(queryString.toLowerCase()) != -1)
         }
       },
-      loadAll() {
-        return [
-          {
-            value: '随记1'
-          },
-          {
-            value: '随记2'
-          },
-          {
-            value: '随记3'
-          }
-        ]
+      getTitle() { // 获取标题下拉列表
+        this.$ajax.get('/blogoperation/getList').then(res => {
+          this.TitleLists = res.data.data.data.map(item => {
+            return {value: item.name, label: item.id}
+          })
+        })
       },
       handleSelect(item) {
         console.log(item)
@@ -226,7 +293,7 @@
       }
     },
     mounted() {
-      this.restaurants = this.loadAll()
+      this.getTitle()
       this.getData()
     }
   }
@@ -247,7 +314,7 @@
     }
     .operation-btns{
       position: relative;
-      margin-bottom:10px;
+      margin-bottom:20px;
       .el-button+.el-button {
         margin-left: 0px;
       }
@@ -255,6 +322,12 @@
         position: absolute;
         right: 0px;
       }
+    }
+    .el-autocomplete{
+      width: 100%;
+    }
+    .el-date-editor--datetimerange.el-input {
+      width: 100%;
     }
   }
 </style>

@@ -94,7 +94,6 @@
       },
       closeDialog() {
         this.$emit('close', this.refreshDialog)
-        this.refreshDialog = false
       },
       editDialog() {
         this.showDialog = true
