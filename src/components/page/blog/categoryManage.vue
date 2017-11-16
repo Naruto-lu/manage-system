@@ -29,7 +29,11 @@
       </div>
     </el-dialog>
     <!-- 添加分类 -->
-    <add-category :display="showDialog" @close="closeEvent"></add-category>
+    <add-category :display="showDialog" @close="closeEvent">
+      
+      sjdklasjdldfjdlkjf
+
+    </add-category>
   </div>
 </template>
 

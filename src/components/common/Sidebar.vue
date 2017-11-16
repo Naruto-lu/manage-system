@@ -31,8 +31,18 @@
                     },
                     {
                         icon: 'el-icon-edit',
-                        index: 'blogmanage',
-                        title: '博文管理'
+                        index: '1',
+                        title: '博文管理',
+                        subs: [
+                            {
+                                index: 'blogmanage',
+                                title: '信息管理'
+                            },
+                            {
+                                index: 'blogstatus',
+                                title: '状态管理'
+                            }
+                        ]
                     },
                     {
                         icon: 'el-icon-star-on',

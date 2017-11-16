@@ -23,6 +23,10 @@ export default new Router({
                     component: resolve => require(['../components/page/blog/index.vue'], resolve)
                 },
                 {
+                    path: '/blogstatus',
+                    component: resolve => require(['../components/page/blog/index.vue'], resolve)
+                },
+                {
                     path: '/comment',
                     component: resolve => require(['../components/page/comment/index.vue'], resolve)
                 },
